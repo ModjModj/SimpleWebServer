@@ -157,4 +157,100 @@
       </div>
     </div>
   </body>
+  <!-- Order placed modal -->
+  <div id="order-modal" class="order-modal" aria-hidden="true">
+    <div class="modal-overlay" role="presentation"></div>
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="order-modal-title">
+      <button class="order-modal-close" aria-label="Close">×</button>
+      <div class="modal-content">
+        <div class="modal-title" id="order-modal-title">Order placed</div>
+        <div class="modal-body">
+          <p>Thanks — your order has been placed.</p>
+          <p class="order-number-line">Order number: <strong id="order-number">—</strong></p>
+        </div>
+        <div class="modal-actions">
+          <button class="button-secondary" type="button" id="view-orders">View your orders</button>
+          <button class="button-primary" type="button" id="continue-shopping">Continue shopping</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      function showOrderPlaced(orderId){
+        var modal = document.getElementById('order-modal');
+        var number = document.getElementById('order-number');
+        if(number) number.textContent = orderId || '—';
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+      }
+
+      function closeModal(){
+        var modal = document.getElementById('order-modal');
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+      }
+
+      var placeBtn = document.querySelector('.place-order-button');
+      if(placeBtn){
+        placeBtn.addEventListener('click', function(e){
+          // Prevent default submit behavior if inside a form
+          if(e) e.preventDefault && e.preventDefault();
+          // In a real app, the server returns an order id. Here we generate a demo id.
+          var demoId = 'ORD-' + Date.now().toString().slice(-6);
+          showOrderPlaced(demoId);
+        });
+      }
+
+      var closeBtn = document.querySelector('.order-modal-close');
+      if(closeBtn) closeBtn.addEventListener('click', closeModal);
+
+      var modalWrap = document.getElementById('order-modal');
+      if(modalWrap){
+        modalWrap.addEventListener('click', function(e){
+          if(e.target === modalWrap) closeModal();
+        });
+      }
+
+      // When either modal action is clicked, open a lightweight image viewer
+      // showing `images/moseley.png`.
+      function openImageViewer(path){
+        // Avoid creating multiple viewers
+        if(document.getElementById('image-viewer')) return;
+        var viewer = document.createElement('div');
+        viewer.id = 'image-viewer';
+        viewer.className = 'image-viewer';
+        viewer.innerHTML = '\n+          <button class="image-viewer-close" aria-label="Close image">×</button>\n+          <img src="' + path + '" alt="Moseley image" class="image-viewer-img">\n+        ';
+        document.body.appendChild(viewer);
+
+        function removeViewer(){
+          document.removeEventListener('keydown', onKey);
+          if(viewer && viewer.parentNode) viewer.parentNode.removeChild(viewer);
+        }
+
+        function onKey(e){ if(e.key === 'Escape') removeViewer(); }
+
+        document.addEventListener('keydown', onKey);
+
+        viewer.addEventListener('click', function(e){
+          // close when clicking background or close button
+          if(e.target === viewer || e.target.classList.contains('image-viewer-close')){
+            removeViewer();
+          }
+        });
+      }
+
+      var viewBtn = document.getElementById('view-orders');
+      var contBtn = document.getElementById('continue-shopping');
+      var moseleyPath = 'images/moseley.png';
+      if(viewBtn) viewBtn.addEventListener('click', function(){ openImageViewer(moseleyPath); });
+      if(contBtn) contBtn.addEventListener('click', function(){ openImageViewer(moseleyPath); });
+
+      document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeModal(); });
+
+      // Expose for other scripts/tests
+      window.showOrderPlaced = showOrderPlaced;
+    })();
+  </script>
 </html>

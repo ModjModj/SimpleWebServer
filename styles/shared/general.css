@@ -99,3 +99,114 @@ select:focus,
 input:focus {
   outline: 2px solid rgb(255, 153, 0);
 }
+
+/* Order modal styles */
+#order-modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 200ms ease, visibility 200ms ease;
+  z-index: 1000;
+}
+
+#order-modal.open {
+  visibility: visible;
+  opacity: 1;
+}
+
+#order-modal .modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+}
+
+#order-modal .modal-panel {
+  position: relative;
+  background: white;
+  border-radius: 12px;
+  padding: 20px 20px 18px;
+  max-width: 520px;
+  width: 92%;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+  transform: translateY(8px);
+  transition: transform 250ms ease;
+  z-index: 1;
+}
+
+#order-modal.open .modal-panel {
+  transform: translateY(0);
+}
+
+.order-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.modal-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.modal-body p { margin: 6px 0; }
+.order-number-line { color: rgb(33,33,33); margin-top: 8px; }
+
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px; }
+
+@media (max-width: 420px) {
+  #order-modal .modal-panel { padding: 16px; border-radius: 10px; }
+  .modal-title { font-size: 18px; }
+}
+
+/* Larger modal action buttons (visual only - no navigation) */
+.modal-actions .button-primary,
+.modal-actions .button-secondary {
+  padding: 12px 18px;
+  font-size: 16px;
+  min-width: 150px;
+  border-radius: 10px;
+}
+
+.modal-actions .button-secondary {
+  background: white;
+  border: 1px solid rgb(213, 217, 217);
+}
+
+/* Image viewer (lightbox) */
+.image-viewer {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.85);
+  z-index: 1100;
+}
+
+.image-viewer-img {
+  max-width: 92%;
+  max-height: 92%;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+}
+
+.image-viewer-close {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  font-size: 28px;
+  color: white;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
