@@ -1,7 +1,3 @@
-
-Checkout · HTML
-Copy
-
 <!DOCTYPE html>
 <html>
   <head>
@@ -204,6 +200,58 @@ Copy
       .modal-actions { display:flex; gap:12px; margin-top:20px; justify-content:center; }
       .button-secondary { padding:10px 20px; border:1.5px solid #007185; border-radius:24px; background:#fff; color:#007185; font-weight:600; cursor:pointer; }
       .button-primary { padding:10px 20px; border:none; border-radius:24px; background:linear-gradient(135deg,#f5a623,#f0870d); color:#111; font-weight:700; cursor:pointer; }
+
+      /* ══════════════════════════════════════
+         MOSELEY IMAGE OVERLAY
+      ══════════════════════════════════════ */
+      .moseley-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 2000;
+        background: rgba(0, 0, 0, 0.92);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+        cursor: pointer;
+      }
+      .moseley-overlay.open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .moseley-img-wrap {
+        position: relative;
+        transform: scale(0.7) rotate(-5deg);
+        transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .moseley-overlay.open .moseley-img-wrap {
+        transform: scale(1) rotate(0deg);
+      }
+      .moseley-img {
+        max-width: min(420px, 88vw);
+        max-height: 80vh;
+        border-radius: 12px;
+        box-shadow: 0 32px 80px rgba(0,0,0,0.7), 0 0 0 3px rgba(255,255,255,0.1);
+        display: block;
+      }
+      .moseley-caption {
+        text-align: center;
+        color: rgba(255,255,255,0.7);
+        font-size: 0.8rem;
+        margin-top: 12px;
+        letter-spacing: 0.05em;
+      }
+      .moseley-close-hint {
+        position: absolute;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: rgba(255,255,255,0.4);
+        font-size: 0.75rem;
+        letter-spacing: 0.08em;
+      }
     </style>
   </head>
   <body>
@@ -211,7 +259,6 @@ Copy
       <div class="header-content">
         <div class="checkout-header-left-section">
           <a href="amazon.html">
-            <!-- Fallback text if image missing -->
             <span style="color:#fff;font-size:1.4rem;font-weight:700;letter-spacing:-1px;">amazon</span>
           </a>
         </div>
@@ -288,7 +335,6 @@ Copy
     <!-- ══ CREDIT CARD MODAL ══ -->
     <div id="cc-overlay" class="cc-overlay" role="dialog" aria-modal="true" aria-labelledby="cc-title">
       <div class="cc-modal">
-        <!-- Card preview -->
         <div class="cc-card-preview">
           <div class="cc-network"><span class="n1"></span><span class="n2"></span></div>
           <div class="cc-chip"></div>
@@ -305,7 +351,6 @@ Copy
           </div>
         </div>
 
-        <!-- Form -->
         <div class="cc-body">
           <div class="cc-title" id="cc-title">Payment details</div>
 
@@ -371,9 +416,17 @@ Copy
       </div>
     </div>
 
+    <!-- ══ MOSELEY IMAGE OVERLAY ══ -->
+    <div id="moseley-overlay" class="moseley-overlay" role="dialog" aria-modal="true" aria-label="Special delivery">
+      <div class="moseley-img-wrap">
+        <img class="moseley-img" src="images/moseley.png" alt="Special guest">
+        <div class="moseley-caption">Your order is in safe hands 🌹</div>
+      </div>
+      <div class="moseley-close-hint">click anywhere to dismiss</div>
+    </div>
+
     <script>
     (function(){
-      /* ── Helpers ── */
       const $ = id => document.getElementById(id);
 
       /* ── Credit card modal ── */
@@ -385,7 +438,6 @@ Copy
         clearErrors();
       }
 
-      $('place-order-button') // handled below via querySelector
       document.querySelector('.place-order-button').addEventListener('click', e => {
         e.preventDefault();
         openCC();
@@ -400,7 +452,6 @@ Copy
       const expiryInput = $('cc-expiry');
 
       numInput.addEventListener('input', function(){
-        // Format as groups of 4
         let v = this.value.replace(/\D/g,'').slice(0,16);
         this.value = v.replace(/(.{4})/g,'$1 ').trim();
         const disp = v.padEnd(16,'•');
@@ -471,12 +522,46 @@ Copy
         modal.setAttribute('aria-hidden','true');
       }
 
-      document.querySelector('.order-modal-close').addEventListener('click', closeOrderModal);
-      document.addEventListener('keydown', e => {
-        if(e.key === 'Escape'){ closeCC(); closeOrderModal(); }
+      /* ── Moseley overlay ── */
+      const moseleyOverlay = $('moseley-overlay');
+
+      function showMoseley() {
+        moseleyOverlay.classList.add('open');
+      }
+      function hideMoseley() {
+        moseleyOverlay.classList.remove('open');
+      }
+
+      moseleyOverlay.addEventListener('click', hideMoseley);
+
+      /* Close button (×) on order modal → show Moseley */
+      document.querySelector('.order-modal-close').addEventListener('click', function() {
+        closeOrderModal();
+        showMoseley();
       });
-      $('view-orders').addEventListener('click', closeOrderModal);
-      $('continue-shopping').addEventListener('click', closeOrderModal);
+
+      /* "View your orders" button → show Moseley */
+      $('view-orders').addEventListener('click', function() {
+        closeOrderModal();
+        showMoseley();
+      });
+
+      /* "Continue shopping" → show Moseley */
+      $('continue-shopping').addEventListener('click', function() {
+        closeOrderModal();
+        showMoseley();
+      });
+
+      document.addEventListener('keydown', e => {
+        if(e.key === 'Escape'){
+          closeCC();
+          if($('order-modal').classList.contains('open')){
+            closeOrderModal();
+            showMoseley();
+          }
+          hideMoseley();
+        }
+      });
 
       window.showOrderPlaced = showOrderPlaced;
     })();
